@@ -1,13 +1,13 @@
-# Mini Twitter - Frontend
-
-Frontend do Mini Twitter desenvolvido com React, TypeScript e Tailwind CSS para o processo seletivo.
-
-## ⚠️ Aviso Importante (Leia)
+# ⚠️ Aviso Importante (Leia)
 
 Houve mudanças relevantes no backend durante a evolução do projeto. Sendo totalmente sincero: o sistema original não estava muito coerente com minhas vontades e com a direção que eu queria para o produto, então ele precisou de um **upgrade** para ficar mais consistente.
 
 - Resumo das mudanças no backend: [BACKEND_CHANGES.md](../BACKEND_CHANGES.md)
 - Casos de uso implementados no sistema: [CASOS_DE_USO_IMPLEMENTADOS.md](CASOS_DE_USO_IMPLEMENTADOS.md)
+
+No total, foram necessários 4 dias para desenvolver esse projeto, com uma carga horária diária aproximada de 7 horas. O projeto foi **inteiramente** feito com o uso das IAs ChatGPT 5.3 Codex e Claude Sonnet 4.5 pela extensão do VS Code "Github Copilot". Apesar disso, é importante dizer que várias ideias de implementação de casos de uso, do tratamento adequado dos dados, da comunicação eficiente e segura do frontend com o backend, dentre outros processos de boa prática relacionados à área de desenvolvimento web foram feitos por esse candidato que vos fala. Logo, quero dizer que, atualmente, utilizo a prática do **"vibe coding"** para fazer meus projetos, contudo respeitando os parâmetros de aprendizagem que tive durante minha formação técnica e os novos que ainda estão por vir no decorrer da minha graduação.
+
+Desde já, agradeço pela oportunidade dada a mim e espero que gostem do meu trabalho. 
 
 ## 🚀 Tecnologias Utilizadas
 
