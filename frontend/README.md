@@ -2,6 +2,13 @@
 
 Frontend do Mini Twitter desenvolvido com React, TypeScript e Tailwind CSS para o processo seletivo.
 
+## ⚠️ Aviso Importante (Leia)
+
+Houve mudanças relevantes no backend durante a evolução do projeto. Sendo totalmente sincero: o sistema original não estava muito coerente com minhas vontades e com a direção que eu queria para o produto, então ele precisou de um **upgrade** para ficar mais consistente.
+
+- Resumo das mudanças no backend: [BACKEND_CHANGES.md](../BACKEND_CHANGES.md)
+- Casos de uso implementados no sistema: [CASOS_DE_USO_IMPLEMENTADOS.md](CASOS_DE_USO_IMPLEMENTADOS.md)
+
 ## 🚀 Tecnologias Utilizadas
 
 | Tecnologia | Versão | Propósito |
