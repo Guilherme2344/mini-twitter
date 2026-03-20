@@ -20,7 +20,9 @@ const getStoredUserId = (): number | undefined => {
 
 const getThemeMode = (userId?: number): ThemeMode => {
   const raw = localStorage.getItem(getThemeStorageKey(userId));
-  return raw === 'light' ? 'light' : 'dark';
+  if (raw === 'light') return 'light';
+  if (raw === 'dark') return 'dark';
+  return 'dark';
 };
 
 const setThemeMode = (mode: ThemeMode, userId?: number) => {
@@ -49,6 +51,7 @@ export const themePreferencesService = {
   setThemeModeForSession(mode: ThemeMode, userId?: number) {
     if (typeof userId === 'number') {
       setThemeMode(mode, userId);
+      return;
     }
 
     setThemeMode(mode);
