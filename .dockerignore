@@ -1,0 +1,10 @@
+node_modules
+.git
+.cursor
+db.sqlite
+db.sqlite-journal
+*.log
+.env
+Dockerfile
+docker-compose.yml
+README.md
