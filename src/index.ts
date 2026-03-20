@@ -9,6 +9,8 @@ import { AuthService } from "./services/auth.service";
 
 await AuthService.ensureAdminAccount();
 
+const port = Number(process.env.PORT || 3000);
+
 const app = new Elysia()
   .use(swagger({
     documentation: {
@@ -53,7 +55,7 @@ const app = new Elysia()
   .use(authRoutes)
   .use(postRoutes)
   .use(adminRoutes)
-  .listen(3000);
+  .listen(port);
 
 console.log(
   `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`

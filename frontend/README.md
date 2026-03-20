@@ -85,6 +85,18 @@ Desde já, agradeço pela oportunidade dada a mim e espero que gostem do meu tra
    http://localhost:5173
    ```
 
+## ▲ Deploy no Vercel
+
+1. Faça import do diretório `frontend` no Vercel.
+2. Em **Build and Output Settings**, use:
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
+3. Configure a variável de ambiente:
+   - `VITE_API_URL` = URL pública do backend
+4. Faça o deploy.
+
+Observação: este projeto usa rotas SPA e já possui `vercel.json` com rewrite para `index.html`.
+
 ## 📁 Estrutura do Projeto
 
 ```

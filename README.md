@@ -64,5 +64,12 @@ Após iniciar o servidor, a documentação interativa (Swagger) pode ser acessad
 O projeto utiliza as seguintes variáveis (configuradas com valores padrão):
 - `JWT_SECRET`: Chave secreta para assinatura dos tokens.
 
+## 🚂 Deploy no Railway
+
+- Guia completo: [RAILWAY_DEPLOY.md](RAILWAY_DEPLOY.md)
+- Ajuste já aplicado no backend: suporte à porta dinâmica via `PORT` (necessário em plataformas cloud).
+
+Importante: este projeto usa `SQLite` local (`db.sqlite`). Para produção com menos limitação de persistência/escala, considere migrar para PostgreSQL.
+
 ---
 Desenvolvido para o processo seletivo da B2Bit.
