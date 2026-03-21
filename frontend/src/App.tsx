@@ -9,6 +9,7 @@ import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
 import AdminPage from './pages/AdminPage';
 import AdminUserPostsPage from './pages/AdminUserPostsPage';
+import AdminUserReportedPostsPage from './pages/AdminUserReportedPostsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -53,6 +54,14 @@ function App() {
                 element={
                   <PrivateRoute>
                     <AdminUserPostsPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/admin/users/:userUuid/reported-posts"
+                element={
+                  <PrivateRoute>
+                    <AdminUserReportedPostsPage />
                   </PrivateRoute>
                 }
               />

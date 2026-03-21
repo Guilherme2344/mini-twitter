@@ -78,6 +78,71 @@ export class AdminService {
     return { user, posts };
   }
 
+  static getUserReportedPostsByUuid(userUuid: string) {
+    const user = db
+      .prepare(
+        `SELECT u.id, u.name, u.email, u.bannedUntil, u.bannedReason,
+          (SELECT COUNT(*) FROM posts p WHERE p.authorId = u.id) as postsCount
+         FROM users u
+         WHERE u.uuid = ?`
+      )
+      .get(userUuid) as
+      | { id: number; name: string; email: string; bannedUntil?: string | null; bannedReason?: string | null; postsCount: number }
+      | undefined;
+
+    if (!user) {
+      return null;
+    }
+
+    const posts = db
+      .prepare(
+        `SELECT DISTINCT p.id, p.title, p.content, p.image, p.createdAt,
+          (SELECT COUNT(*) FROM likes l WHERE l.postId = p.id) as likesCount,
+          (SELECT COUNT(*) FROM reports r WHERE r.postId = p.id) as reportsCount
+         FROM posts p
+         JOIN reports r ON r.postId = p.id
+         WHERE p.authorId = ?
+         ORDER BY p.createdAt DESC`
+      )
+      .all(user.id) as Array<{
+      id: number;
+      title: string;
+      content: string;
+      image?: string | null;
+      createdAt: string;
+      likesCount: number;
+      reportsCount: number;
+    }>;
+
+    const postsWithReports = posts.map((post) => {
+      const reports = db
+        .prepare(
+          `SELECT r.id, r.reason, r.status, r.createdAt,
+            reporter.name as reporterName,
+            reporter.email as reporterEmail
+           FROM reports r
+           JOIN users reporter ON reporter.id = r.reporterId
+           WHERE r.postId = ?
+           ORDER BY r.createdAt DESC`
+        )
+        .all(post.id) as Array<{
+        id: number;
+        reason: string;
+        status: string;
+        createdAt: string;
+        reporterName: string;
+        reporterEmail: string;
+      }>;
+
+      return {
+        ...post,
+        reports,
+      };
+    });
+
+    return { user, posts: postsWithReports };
+  }
+
   static updateUser(userId: number, name: string, email: string) {
     db.prepare("UPDATE users SET name = ?, email = ? WHERE id = ?").run(name, email, userId);
     return db

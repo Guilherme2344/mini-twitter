@@ -1,5 +1,5 @@
 import { api } from './api.service';
-import type { AdminReport, AdminUserDetails, AdminUserOverview, ReportStatus } from '../types/admin.types';
+import type { AdminReport, AdminUserDetails, AdminUserOverview, ReportStatus, AdminUserReportedPostsDetails } from '../types/admin.types';
 
 // Serviço para operações administrativas (usuários, denúncias e banimentos).
 export const adminService = {
@@ -10,6 +10,11 @@ export const adminService = {
 
   async getUserDetailsByUuid(userUuid: string): Promise<AdminUserDetails> {
     const response = await api.get<AdminUserDetails>(`/admin/users/${userUuid}/posts`);
+    return response.data;
+  },
+
+  async getUserReportedPostsByUuid(userUuid: string): Promise<AdminUserReportedPostsDetails> {
+    const response = await api.get<AdminUserReportedPostsDetails>(`/admin/users/${userUuid}/reported-posts`);
     return response.data;
   },
 

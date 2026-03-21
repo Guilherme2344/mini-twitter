@@ -235,6 +235,10 @@ export default function AdminPage() {
     navigate(`/admin/users/${targetUser.uuid}/posts`);
   };
 
+  const handleViewReportedPosts = (targetUser: AdminUserOverview) => {
+    navigate(`/admin/users/${targetUser.uuid}/reported-posts`);
+  };
+
   // Confirma e revoga banimento do usuário selecionado.
   const handleRevokeBan = () => {
     if (!selectedUser) return;
@@ -316,6 +320,7 @@ export default function AdminPage() {
               {filteredUsers.map((listUser) => {
                 const isSelf = listUser.id === user.id;
                 const userHasActiveBan = isBanActive(listUser.bannedUntil);
+                const isAdminRow = listUser.email.toLowerCase() === ADMIN_EMAIL;
 
                 return (
                   <div
@@ -398,6 +403,17 @@ export default function AdminPage() {
                           </svg>
                         )}
                       </button>
+
+                      {!isAdminRow && (
+                        <button
+                          type="button"
+                          title="Ver posts denunciados"
+                          onClick={() => handleViewReportedPosts(listUser)}
+                          className={isDarkMode ? 'text-xs font-semibold text-blue-300 hover:text-blue-200 transition px-3 py-2 rounded-full border border-blue-500/40 hover:border-blue-400/70' : 'text-xs font-semibold text-blue-600 hover:text-blue-700 transition px-3 py-2 rounded-full border border-blue-300 hover:border-blue-400'}
+                        >
+                          Denúncias
+                        </button>
+                      )}
                     </div>
                   </div>
                 );

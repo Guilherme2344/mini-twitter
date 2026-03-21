@@ -1,6 +1,7 @@
 import { Database } from "bun:sqlite";
 
-const db = new Database("db.sqlite", { create: true });
+const databasePath = process.env.DATABASE_PATH || "db.sqlite";
+const db = new Database(databasePath, { create: true });
 
 const hasColumn = (table: string, column: string) => {
   const columns = db

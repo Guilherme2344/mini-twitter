@@ -71,6 +71,28 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
             detail: { tags: ["Admin"], summary: "Listar posts do usuário por UUID" },
           }
         )
+        .get(
+          "/users/:uuid/reported-posts",
+          ({ params, set }) => {
+            const userUuid = params.uuid?.trim();
+            if (!userUuid) {
+              set.status = 400;
+              return { error: "UUID de usuário inválido" };
+            }
+
+            const details = AdminService.getUserReportedPostsByUuid(userUuid);
+            if (!details) {
+              set.status = 404;
+              return { error: "Usuário não encontrado" };
+            }
+
+            return details;
+          },
+          {
+            params: t.Object({ uuid: t.String() }),
+            detail: { tags: ["Admin"], summary: "Listar posts denunciados do usuário por UUID" },
+          }
+        )
         .put(
           "/users/:id",
           ({ params, body, set, jwt, headers: { authorization } }) => {

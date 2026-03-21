@@ -17,6 +17,25 @@ export interface AdminUserPost {
   likesCount: number;
 }
 
+export interface AdminPostReportDetail {
+  id: number;
+  reason: string;
+  status: ReportStatus;
+  createdAt: string;
+  reporterName: string;
+  reporterEmail: string;
+}
+
+export interface AdminReportedUserPost extends AdminUserPost {
+  reportsCount: number;
+  reports: AdminPostReportDetail[];
+}
+
+export interface AdminUserReportedPostsDetails {
+  user: AdminUserOverview;
+  posts: AdminReportedUserPost[];
+}
+
 export interface AdminUserDetails {
   user: AdminUserOverview;
   posts: AdminUserPost[];
