@@ -325,15 +325,15 @@ export default function AdminPage() {
                 return (
                   <div
                     key={listUser.id}
-                    className={isDarkMode ? 'w-full rounded-xl border border-gray-700 px-4 py-3 flex items-center justify-between gap-3' : 'w-full rounded-xl border border-gray-200 px-4 py-3 flex items-center justify-between gap-3'}
+                    className={isDarkMode ? 'w-full rounded-xl border border-gray-700 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3' : 'w-full rounded-xl border border-gray-200 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3'}
                   >
-                    <div>
+                    <div className="min-w-0">
                       <p className={isDarkMode ? 'text-white font-semibold' : 'text-slate-900 font-semibold'}>{listUser.name}</p>
                       <p className={isDarkMode ? 'text-gray-400 text-xs' : 'text-gray-500 text-xs'}>{listUser.email}</p>
                       <p className={isDarkMode ? 'text-gray-400 text-xs' : 'text-gray-500 text-xs'}>{formatBanStatus(listUser.bannedUntil)}</p>
                     </div>
 
-                    <div className="flex items-center gap-1">
+                    <div className="flex w-full sm:w-auto flex-wrap items-center justify-end gap-1">
                       <button
                         type="button"
                         title="Editar"

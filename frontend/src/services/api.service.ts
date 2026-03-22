@@ -31,7 +31,12 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const status = error.response?.status;
+    const responseData = error.response?.data as { code?: string; error?: string } | undefined;
+    const isBannedResponse = (status === 401 || status === 403)
+      && (responseData?.code === 'USER_BANNED' || responseData?.error === 'Conta Banida');
+
+    if (status === 401 || isBannedResponse) {
       // Token inválido ou expirado
       localStorage.removeItem('token');
       localStorage.removeItem('user');

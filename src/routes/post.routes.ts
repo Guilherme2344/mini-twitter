@@ -50,6 +50,34 @@ export const postRoutes = new Elysia({ prefix: "/posts" })
           set.status = 401;
           return { error: "Não autorizado: Token inválido ou expirado" };
         }
+
+        if (typeof payload.sub !== "string") {
+          set.status = 401;
+          return { error: "Não autorizado: Token inválido ou expirado" };
+        }
+
+        const userId = Number(payload.sub);
+        if (Number.isNaN(userId)) {
+          set.status = 401;
+          return { error: "Não autorizado: Token inválido ou expirado" };
+        }
+
+        const activeBan = AuthService.getActiveBanByUserId(userId);
+        if (activeBan) {
+          if (typeof payload.exp === "number") {
+            AuthService.blacklistToken(token, payload.exp);
+          }
+
+          set.status = 401;
+          return {
+            error: "Conta Banida",
+            code: "USER_BANNED",
+            banReason: activeBan.reason,
+            banDuration: activeBan.isPermanent
+              ? "Para sempre"
+              : `Até ${new Date(activeBan.bannedUntil as string).toLocaleString("pt-BR")}`,
+          };
+        }
       },
     },
     (app) =>

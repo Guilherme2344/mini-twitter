@@ -101,6 +101,25 @@ export class AuthService {
       .get(userId) as { id: number; name: string; email: string; bannedUntil?: string | null } | undefined;
   }
 
+  static getActiveBanByUserId(userId: number) {
+    const user = db
+      .prepare("SELECT bannedUntil, bannedReason FROM users WHERE id = ?")
+      .get(userId) as { bannedUntil?: string | null; bannedReason?: string | null } | undefined;
+
+    if (!user || !this.isBanActive(user.bannedUntil)) {
+      return null;
+    }
+
+    const safeReason = user.bannedReason?.trim() || "Não informado";
+    const isPermanent = user.bannedUntil === "PERMANENT";
+
+    return {
+      bannedUntil: isPermanent ? null : user.bannedUntil || null,
+      reason: safeReason,
+      isPermanent,
+    };
+  }
+
   static isAdminEmail(email: string) {
     return email.toLowerCase() === ADMIN_EMAIL;
   }
