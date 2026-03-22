@@ -94,6 +94,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const handleBannedLogout = async () => {
+    await logout();
+    window.location.assign('/login');
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -127,7 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             </p>
             <button
               type="button"
-              onClick={logout}
+              onClick={handleBannedLogout}
               disabled={isLogoutPending}
               className="w-full bg-[#0ea5e9] hover:bg-[#0284c7] text-white py-2 px-4 rounded-full transition font-medium disabled:opacity-60"
             >
