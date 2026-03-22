@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { User } from '../types/auth.types';
 import { AUTH_BANNED_EVENT, AUTH_UNAUTHORIZED_EVENT, authService } from '../services/api.service';
+import { themePreferencesService } from '../services/theme-preferences.service';
 
 interface AuthContextType {
   user: User | null;
@@ -24,6 +25,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [banNotice, setBanNotice] = useState<BanNotice | null>(null);
   const [isLogoutPending, setIsLogoutPending] = useState(false);
+  const isDarkMode = themePreferencesService.getThemeModeForSession(user?.id) === 'dark';
 
   useEffect(() => {
     // Restaura sessão salva localmente ao iniciar a aplicação.
@@ -114,25 +116,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     >
       {children}
       {banNotice && (
-        <div className="fixed inset-0 z-1000 flex items-center justify-center bg-black/70 px-4">
-          <div className="w-full max-w-md rounded-2xl bg-white border border-red-200 shadow-xl p-6 space-y-4">
-            <h2 className="text-xl font-bold text-slate-900">Conta banida</h2>
-            <p className="text-sm text-slate-700">
-              Sua conta foi banida e o uso do sistema está bloqueado.
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className={isDarkMode ? 'bg-[#1e293b] border border-gray-700 rounded-2xl p-6 max-w-sm w-full' : 'bg-white border border-gray-200 rounded-2xl p-6 max-w-sm w-full'}>
+            <h2 className={isDarkMode ? 'text-white text-xl font-bold mb-2' : 'text-slate-900 text-xl font-bold mb-2'}>Conta Banida</h2>
+            <p className={isDarkMode ? 'text-gray-300 mb-2' : 'text-gray-700 mb-2'}>
+              Sua conta foi banida pelo seguinte motivo: {banNotice.reason}
             </p>
-            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 space-y-2">
-              <p className="text-sm text-slate-800">
-                <span className="font-semibold">Motivo:</span> {banNotice.reason}
-              </p>
-              <p className="text-sm text-slate-800">
-                <span className="font-semibold">Duração:</span> {banNotice.duration}
-              </p>
-            </div>
+            <p className={isDarkMode ? 'text-gray-300 mb-6' : 'text-gray-700 mb-6'}>
+              Sua conta está banida pelo seguinte tempo: {banNotice.duration}
+            </p>
             <button
               type="button"
               onClick={logout}
               disabled={isLogoutPending}
-              className="w-full rounded-xl bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white font-semibold py-3 transition"
+              className="w-full bg-[#0ea5e9] hover:bg-[#0284c7] text-white py-2 px-4 rounded-full transition font-medium disabled:opacity-60"
             >
               {isLogoutPending ? 'Saindo...' : 'Sair'}
             </button>
