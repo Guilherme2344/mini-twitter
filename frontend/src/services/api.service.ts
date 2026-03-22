@@ -17,6 +17,12 @@ export const api = axios.create({
 });
 
 export const AUTH_UNAUTHORIZED_EVENT = 'auth:unauthorized';
+export const AUTH_BANNED_EVENT = 'auth:banned';
+
+type BannedEventDetail = {
+  banReason?: string;
+  banDuration?: string;
+};
 
 // Interceptor para adicionar o token em todas as requisições.
 api.interceptors.request.use((config) => {
@@ -32,11 +38,21 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error.response?.status;
-    const responseData = error.response?.data as { code?: string; error?: string } | undefined;
+    const responseData = error.response?.data as { code?: string; error?: string; banReason?: string; banDuration?: string } | undefined;
     const isBannedResponse = (status === 401 || status === 403)
       && (responseData?.code === 'USER_BANNED' || responseData?.error === 'Conta Banida');
 
-    if (status === 401 || isBannedResponse) {
+    if (isBannedResponse) {
+      const detail: BannedEventDetail = {
+        banReason: responseData?.banReason,
+        banDuration: responseData?.banDuration,
+      };
+
+      window.dispatchEvent(new CustomEvent<BannedEventDetail>(AUTH_BANNED_EVENT, { detail }));
+      return Promise.reject(error);
+    }
+
+    if (status === 401) {
       // Token inválido ou expirado
       localStorage.removeItem('token');
       localStorage.removeItem('user');
