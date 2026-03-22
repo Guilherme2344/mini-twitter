@@ -1,9 +1,11 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import type { AxiosError } from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { adminService } from '../services/admin.service';
+import { postService } from '../services/post.service';
 import type { AdminReportedUserPost } from '../types/admin.types';
 
 const ADMIN_EMAIL = 'minitwitteradmin@access.total.ok';
@@ -35,7 +37,10 @@ export default function AdminUserReportedPostsPage() {
   const { user } = useAuth();
   const { isDarkMode } = useTheme();
   const { userUuid } = useParams<{ userUuid: string }>();
+  const queryClient = useQueryClient();
   const [activeInfoPostId, setActiveInfoPostId] = useState<number | null>(null);
+  const [postToDelete, setPostToDelete] = useState<{ id: number; title: string } | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const isAdmin = user?.email?.toLowerCase() === ADMIN_EMAIL;
 
@@ -43,6 +48,21 @@ export default function AdminUserReportedPostsPage() {
     queryKey: ['admin-user-reported-posts', userUuid],
     queryFn: () => adminService.getUserReportedPostsByUuid(userUuid as string),
     enabled: isAdmin && !!userUuid,
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (postId: number) => postService.deletePost(postId),
+    onSuccess: () => {
+      setActionError(null);
+      setPostToDelete(null);
+      setActiveInfoPostId(null);
+      queryClient.invalidateQueries({ queryKey: ['admin-user-reported-posts', userUuid] });
+      queryClient.invalidateQueries({ queryKey: ['admin-user-posts', userUuid] });
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    },
+    onError: (error: AxiosError<{ error?: string }>) => {
+      setActionError(error.response?.data?.error || 'Não foi possível excluir o post.');
+    },
   });
 
   if (!user) {
@@ -76,6 +96,12 @@ export default function AdminUserReportedPostsPage() {
       </header>
 
       <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-6 sm:py-8">
+        {actionError && (
+          <div className="mb-4 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3">
+            <p className="text-sm text-red-500">{actionError}</p>
+          </div>
+        )}
+
         <div className="space-y-4">
           {detailsQuery.isLoading ? (
             <div className="text-center py-12">
@@ -95,7 +121,7 @@ export default function AdminUserReportedPostsPage() {
                   key={post.id}
                   className={isDarkMode ? 'relative bg-[#1e293b] border border-gray-700 rounded-2xl p-4 sm:p-6 hover:border-gray-600 transition animate-fade-in' : 'relative bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 hover:border-gray-300 transition animate-fade-in'}
                 >
-                  <div className="flex items-start justify-end mb-2">
+                  <div className="flex items-start justify-end gap-1 mb-2">
                     <button
                       type="button"
                       title="Ver motivo da denúncia"
@@ -106,6 +132,20 @@ export default function AdminUserReportedPostsPage() {
                         <circle cx="12" cy="12" r="9" strokeWidth={2} />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6" />
                         <circle cx="12" cy="7" r="1" fill="currentColor" stroke="none" />
+                      </svg>
+                    </button>
+
+                    <button
+                      type="button"
+                      title="Excluir post"
+                      onClick={() => {
+                        setActiveInfoPostId(null);
+                        setPostToDelete({ id: post.id, title: post.title });
+                      }}
+                      className={isDarkMode ? 'text-gray-400 hover:text-red-500 transition p-2' : 'text-gray-500 hover:text-red-500 transition p-2'}
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
                     </button>
                   </div>
@@ -163,6 +203,34 @@ export default function AdminUserReportedPostsPage() {
           )}
         </div>
       </main>
+
+      {postToDelete && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className={isDarkMode ? 'bg-[#1e293b] border border-gray-700 rounded-2xl p-6 max-w-sm w-full' : 'bg-white border border-gray-200 rounded-2xl p-6 max-w-sm w-full'}>
+            <h3 className={isDarkMode ? 'text-white text-xl font-bold mb-2' : 'text-slate-900 text-xl font-bold mb-2'}>Excluir post?</h3>
+            <p className={isDarkMode ? 'text-gray-300 mb-6' : 'text-gray-600 mb-6'}>
+              Tem certeza que deseja excluir “{postToDelete.title}”? Esta ação não pode ser desfeita.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                type="button"
+                onClick={() => setPostToDelete(null)}
+                className={isDarkMode ? 'flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-full transition' : 'flex-1 bg-gray-200 hover:bg-gray-300 text-slate-800 py-2 px-4 rounded-full transition'}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => deleteMutation.mutate(postToDelete.id)}
+                disabled={deleteMutation.isPending}
+                className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-full transition disabled:opacity-50"
+              >
+                {deleteMutation.isPending ? 'Excluindo...' : 'Excluir'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
