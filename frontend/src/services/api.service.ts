@@ -102,6 +102,11 @@ export const authService = {
     return response.data;
   },
 
+  async checkSessionStatus(): Promise<{ active: boolean }> {
+    const response = await api.get<{ active: boolean }>('/auth/session-status');
+    return response.data;
+  },
+
   getStoredUser() {
     const userStr = localStorage.getItem('user');
     return userStr ? JSON.parse(userStr) : null;

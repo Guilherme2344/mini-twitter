@@ -57,6 +57,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  useEffect(() => {
+    if (!user || banNotice || isLogoutPending) {
+      return;
+    }
+
+    const checkSession = async () => {
+      try {
+        await authService.checkSessionStatus();
+      } catch {
+        // Erros de sessão/autorização são tratados globalmente pelos interceptors.
+      }
+    };
+
+    checkSession();
+    const intervalId = window.setInterval(checkSession, 3000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [user, banNotice, isLogoutPending]);
+
   // Encerra sessão no backend e limpa estado local.
   const logout = async () => {
     setIsLogoutPending(true);

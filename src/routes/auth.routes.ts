@@ -107,6 +107,51 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
       detail: { tags: ["Auth"], summary: "Realiza logout e invalida o token atual" },
     }
   )
+  .get(
+    "/session-status",
+    async ({ jwt, headers: { authorization }, set }) => {
+      if (!authorization) {
+        set.status = 401;
+        return { error: "Não autorizado" };
+      }
+
+      const token = authorization.split(" ")[1];
+
+      if (AuthService.isTokenBlacklisted(token)) {
+        set.status = 401;
+        return { error: "Não autorizado: Este token foi invalidado (logout realizado)" };
+      }
+
+      const payload = await jwt.verify(token);
+
+      if (!payload || typeof payload.sub !== 'string') {
+        set.status = 401;
+        return { error: "Token inválido" };
+      }
+
+      const activeBan = AuthService.getActiveBanByUserId(Number(payload.sub));
+      if (activeBan) {
+        if (typeof payload.exp === 'number') {
+          AuthService.blacklistToken(token, payload.exp);
+        }
+
+        set.status = 401;
+        return {
+          error: "Conta Banida",
+          code: "USER_BANNED",
+          banReason: activeBan.reason,
+          banDuration: activeBan.isPermanent
+            ? "Para sempre"
+            : `Até ${new Date(activeBan.bannedUntil as string).toLocaleString('pt-BR')}`,
+        };
+      }
+
+      return { active: true };
+    },
+    {
+      detail: { tags: ["Auth"], summary: "Verifica status da sessão autenticada" },
+    }
+  )
   .delete(
     "/me",
     async ({ jwt, headers: { authorization }, set }) => {
